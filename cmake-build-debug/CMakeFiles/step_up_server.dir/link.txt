@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/step_up_server.dir/step1/ServerSelect.cc.o CMakeFiles/step_up_server.dir/step1/Select.cc.o  -o step_up_server 
