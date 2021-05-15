@@ -5,7 +5,7 @@
 #ifndef STEP_UP_SERVER_SOCKET_H
 #define STEP_UP_SERVER_SOCKET_H
 
-#include <step1/Sockaddr.h>
+#include "net/Sockaddr.h"
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
