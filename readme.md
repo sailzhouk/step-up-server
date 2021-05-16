@@ -1,5 +1,6 @@
 该服务器为最基础的多路I/O复用服务器，实现的功能只有简单的回射服务，没有提供注册回调函数的功能。
 并且目前也仅能处理读取事件。
+
 ## Sockaddr
 封装了一个`sockaddr_in`类型的成员，向外界提供`getSockaddr`, `getSockaddrIn`, `getlen`的接口。
 
@@ -10,10 +11,23 @@
 
 当`toBind`被调用时，Socket类会保存一个`Sockaddr`的指针，使得在`toAccept`时无需重新传入`Sockaddr`
 
-## Select
+## Select、Poll、Epoll
 Select类，将客户的文件描述符全部存放在`clients_`数组中，在对象初始化时必须要提供监听连接请求的Socket对象，通过该对象来初始化类
 中其他成员。提供`toSelect`方法封装`::select`调用，当有事件返回时通过`handleActiveEvents`方法对事件进行处理（目前仅仅是完成回
 射服务）。现阶段在调用`toSelect`时需要在外部进行循环，这里可能结构也有一些问题。
 
-## Poll
-Poll类，基本保持与Select类一致的接口
+Poll类和Epoll类也与Select类保持一致的接口
+
+## 存在的问题
+
+目前这个版本的代码，功能缺失较多，仅仅只是相当于将UDP前面的练习代码进行了面对对象的封装。
+
+- 阻塞IO
+- 单线程
+- 只能处理默认的回射服务，不支持用户注册回调函数
+- 默认监听读事件，无法自行设置
+- Select、Poll、Epoll封装了多余的操作，用户应该通过Server这个更抽象的概念去使用它们
+- 没有实现客户端
+- 很多可能出现的异常和错误都没有进行处理
+- 没有日志信息
+

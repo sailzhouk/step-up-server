@@ -6,6 +6,8 @@
 #include "net/Select.h"
 #include "net/Sockaddr.h"
 #include "net/Poll.h"
+#include "net/Epoll.h"
+
 int main(int argc, char *argv[]) {
   const std::string ipAddress = "127.0.0.1";
   const int port = 6666;
@@ -18,9 +20,11 @@ int main(int argc, char *argv[]) {
 //  std::cout << "accept ok" << fdc << std::endl;
   Select selector(listenSocket);
   Poll poller(listenSocket);
+  Epoll epoller(listenSocket);
   while (true) {
 //    selector.toSelect();
-    poller.toSelect();
+//    poller.toSelect();
+    epoller.toSelect();
   }
 //  close(fdc);
   return 0;
