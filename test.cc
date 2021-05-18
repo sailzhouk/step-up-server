@@ -3,29 +3,24 @@
 //
 
 #include "net/Socket.h"
-#include "net/Select.h"
 #include "net/Sockaddr.h"
-#include "net/Poll.h"
 #include "net/Epoll.h"
+#include "net/EventLoop.h"
+#include "net/Channel.h"
+#include "net/Echo.h"
+#include "net/Acceptor.h"
+
+using namespace step;
 
 int main(int argc, char *argv[]) {
   const std::string ipAddress = "127.0.0.1";
   const int port = 6666;
   Sockaddr sa = Sockaddr(ipAddress, port);
 
-  Socket listenSocket;
-  listenSocket.toBind(sa);
-  listenSocket.toListen();
-//  int fdc = listenSocket.toAccept();
-//  std::cout << "accept ok" << fdc << std::endl;
-  Select selector(listenSocket);
-  Poll poller(listenSocket);
-  Epoll epoller(listenSocket);
-  while (true) {
-//    selector.toSelect();
-//    poller.toSelect();
-    epoller.toSelect();
-  }
-//  close(fdc);
-  return 0;
+//  Socket listenSocket;
+//  listenSocket.toBind(sa);
+  EventLoop loop;
+  Acceptor acceptor(&loop, sa);
+  Echo echor(&loop, &acceptor);
+  echor.start();
 }

@@ -6,6 +6,7 @@
 #define STEP_UP_SERVER_SOCKET_H
 
 #include "net/Sockaddr.h"
+#include "utils/Uncopyable.h"
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -14,11 +15,12 @@
 #include <unistd.h>
 #include <iostream>
 
-class Socket {
-public:
+namespace step {
+class Socket : Uncopyable {
+ public:
   Socket()
-    : fd_(::socket(AF_INET, SOCK_STREAM, 0)),
-      sa_(nullptr) {
+      : fd_(::socket(AF_INET, SOCK_STREAM, 0)),
+        sa_(nullptr) {
   }
 
   ~Socket() {
@@ -31,7 +33,10 @@ public:
   }
 
   void toListen(int backlog = 5) const {
-    assert(::listen(fd_, backlog) == 0);
+    if(::listen(fd_, backlog) != 0) {
+      std::cerr << "listen failed: " << errno << std::endl;
+      abort();
+    }
   }
 
   int toAccept() {
@@ -54,14 +59,28 @@ public:
     return retfd;
   }
 
-  void toConnect(Sockaddr& saTarget) {
+  void toConnect(Sockaddr& saTarget) const {
     assert(::connect(fd_, saTarget.getSockaddr(), saTarget.getlen()) == 0);
   };
 
+  void setReuseAddr(bool on) const {
+    int optval = on ? 1 : 0;
+    ::setsockopt(fd_, SOL_SOCKET, SO_REUSEADDR,
+                 &optval, static_cast<socklen_t>(sizeof optval));
+  }
+
+  void setReusePort(bool on) const {
+    int optval = on ? 1 : 0;
+    ::setsockopt(fd_, SOL_SOCKET, SO_REUSEPORT,
+                 &optval, static_cast<socklen_t>(sizeof optval));
+  }
+
+  // getter
   int getfd() const { return fd_; }
 
-private:
+ private:
   Sockaddr* sa_{};
   int fd_;
 };
+}
 #endif //STEP_UP_SERVER_SOCKET_H
